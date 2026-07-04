@@ -1,0 +1,33 @@
+name: CI Tests
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: test successfully builds (50 pts)
+        if: ${{ !cancelled() }}
+        run: |
+          make clean
+          make
+      - name: test isPrime (25 pts)
+        if: ${{ !cancelled() }}
+        run: |
+          make
+          ./test --list-test-names-only [task1] | grep . && ./test [task1]
+      - name: test findPrimes (25 pts)
+        if: ${{ !cancelled() }}
+        run: |
+          make
+          ./test --list-test-names-only [task2] | grep . && ./test [task2]
+      - name: system tests
+        if: ${{ !cancelled() }}
+        run: |
+          make
+          ./scripts/run-system-tests
